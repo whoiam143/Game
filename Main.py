@@ -3,9 +3,10 @@ import random
 
 pygame.init()
 
-ARIAL_50 = pygame.font.SysFont("arial", 50)
+ARIAL_50 = pygame.font.SysFont("Montserrat", 50)
 
 WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 
 
 class Button:
@@ -65,18 +66,19 @@ class Main:
         self.height = 1080
 
         self.display = pygame.display.set_mode((self.width, self.height))
-        pygame.display.set_caption("Title")
+        pygame.display.set_caption("Shoot to win")
         self.display.fill(pygame.Color("black"))
         self.loop = True
 
-        self.cursor = pygame.image.load("Texture/pricel.png").convert_alpha()
+        self.cursor = pygame.image.load("Texture_and_Sound/pricel.png").convert_alpha()
         pygame.mouse.set_visible(False)
 
-        self.BackGround = Background("Texture/level1.png", [0, 0])
+        self.BackGround = Background("Texture_and_Sound/Menu.png", [0, 0])
         self.display.blit(self.BackGround.image, self.BackGround.rect)
 
-        self.butt1 = Button(self.width / 2 - (252 / 2), 500, 252, 75, "test1", "Texture/Phon.png", "Texture/logo.png")
-        self.butt2 = Button(self.width / 2 - (252 / 2), 700, 252, 75, "test2", "Texture/logo.png", "Texture/Phon.png")
+        self.butt1 = Button(self.width / 2 - (252 / 2), 500, 252, 75, "Start", "Texture_and_Sound/button.png", "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
+        self.butt2 = Button(self.width / 2 - (252 / 2), 650, 252, 75, "Authors", "Texture_and_Sound/button.png", "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
+        self.butt3 = Button(self.width / 2 - (252 / 2), 800, 252, 75, "Exit", "Texture_and_Sound/button.png", "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
 
     def main_game_loop(self):
         while self.loop:
@@ -86,6 +88,9 @@ class Main:
             self.butt1.check_hover(pygame.mouse.get_pos())
             self.butt2.draw_button(self.display)
             self.butt2.check_hover(pygame.mouse.get_pos())
+            self.butt3.draw_button(self.display)
+            self.butt3.check_hover(pygame.mouse.get_pos())
+
             pos = pygame.mouse.get_pos()
             if pygame.mouse.get_focused():
                 self.display.blit(self.cursor, pos)
@@ -93,6 +98,9 @@ class Main:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.loop = False
+                self.butt1.handle_event(event)
+                self.butt2.handle_event(event)
+                self.butt3.handle_event(event)
 
             pygame.display.flip()
 
