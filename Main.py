@@ -1,6 +1,8 @@
 import pygame
-import random
+import sys
+import webbrowser
 
+# from Menu import Menu
 pygame.init()
 
 FONT_50 = pygame.font.SysFont("Montserrat", 50)
@@ -17,8 +19,8 @@ class Button:
         self.height = height
         self.text = text
 
-        self.image = pygame.image.load(image_path)
-        self.image = pygame.transform.scale(self.image, (width, height))
+        self._image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self._image, (width, height))
         self.hover_image = self.image
         if hover_impage_path:
             self.hover_image = pygame.image.load(hover_impage_path)
@@ -45,19 +47,11 @@ class Button:
     def check_hover(self, mouse_pos):  # Проверка ли мышь на кнопке
         self.is_hovered = self.rect.collidepoint(mouse_pos)
 
-    def handle_event(self, event):
+    def handle_event(self, event):  # Звук при нажатие на кнопку
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.is_hovered:
             if self.sound:
                 self.sound.play()
             pygame.event.post(pygame.event.Event(pygame.USEREVENT, button=self))
-
-
-class Background(pygame.sprite.Sprite):
-    def __init__(self, image_file, location):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(image_file)
-        self.rect = self.image.get_rect()
-        self.rect.left, self.rect.top = location
 
 
 class Main:
@@ -73,23 +67,34 @@ class Main:
         self.cursor = pygame.image.load("Texture_and_Sound/pricel.png").convert_alpha()
         pygame.mouse.set_visible(False)
 
-        self.BackGround = Background("Texture_and_Sound/Menu.png", [0, 0])
-        self.display.blit(self.BackGround.image, self.BackGround.rect)
+        self.phon = pygame.image.load("Texture_and_Sound/Menu.png")
 
-        self.butt1 = Button(self.width / 2 - (252 / 2), 500, 252, 75, "Start", "Texture_and_Sound/button.png", "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
-        self.butt2 = Button(self.width / 2 - (252 / 2), 650, 252, 75, "Authors", "Texture_and_Sound/button.png", "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
-        self.butt3 = Button(self.width / 2 - (252 / 2), 800, 252, 75, "Exit", "Texture_and_Sound/button.png", "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
+        self._start_butt = Button(self.width / 2 - (252 / 2), 500, 252, 75, "Start", "Texture_and_Sound/button.png",
+                                  "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
+        self._authors_butt = Button(self.width / 2 - (252 / 2), 650, 252, 75, "Authors", "Texture_and_Sound/button.png",
+                                    "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
+        self._exit_butt = Button(self.width / 2 - (252 / 2), 800, 252, 75, "Exit", "Texture_and_Sound/button.png",
+                                 "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
 
-    def main_game_loop(self):
-        while self.loop:
-            self.display.blit(self.BackGround.image, self.BackGround.rect)
+    def show_authours(self):  # Окно авторов
+        loop = True
+        self.display.fill((255, 255, 255))
 
-            self.butt1.draw_button(self.display)
-            self.butt1.check_hover(pygame.mouse.get_pos())
-            self.butt2.draw_button(self.display)
-            self.butt2.check_hover(pygame.mouse.get_pos())
-            self.butt3.draw_button(self.display)
-            self.butt3.check_hover(pygame.mouse.get_pos())
+        link_color1 = (0, 0, 0)
+        link_color2 = (0, 0, 0)
+
+        Emil = FONT_50.render("Cултанов Эмиль", True, BLACK)
+        Adil = FONT_50.render("Ахметов Адиль", True, BLACK)
+
+        self.display.blit(self.phon, [0, 0])
+        while loop:
+            self.display.blit(self.phon, [0, 0])
+
+            self.display.blit(Emil, (600, 500))
+            self.display.blit(Adil, (1100, 500))
+
+            git1 = self.display.blit(FONT_50.render("Github", True, link_color1), (680, 600))
+            git2 = self.display.blit(FONT_50.render("Github", True, link_color2), (1180, 600))
 
             pos = pygame.mouse.get_pos()
             if pygame.mouse.get_focused():
@@ -97,10 +102,61 @@ class Main:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    loop = False
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    # Возврат в меню при нажатие на esc
+                    if event.key == pygame.K_ESCAPE:
+                        loop = False
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pos = event.pos
+
+                    if git1.collidepoint(pos):
+                        webbrowser.open(r"https://github.com/whoiam143")
+
+                    if git2.collidepoint(pos):
+                        webbrowser.open(r"https://github.com/zetistheself")
+
+            # Если наводить меняется цвет
+            if git1.collidepoint(pygame.mouse.get_pos()):
+                link_color1 = (70, 30, 220)
+            else:
+                link_color1 = (0, 0, 0)
+
+            if git2.collidepoint(pygame.mouse.get_pos()):
+                link_color2 = (70, 30, 220)
+            else:
+                link_color2 = (0, 0, 0)
+
+            pygame.display.update()
+            pygame.display.flip()
+
+    def main_game_loop(self):
+        while self.loop:
+            self.display.blit(self.phon, [0, 0])
+
+            self._start_butt.draw_button(self.display)
+            self._start_butt.check_hover(pygame.mouse.get_pos())
+            self._authors_butt.draw_button(self.display)
+            self._authors_butt.check_hover(pygame.mouse.get_pos())
+            self._exit_butt.draw_button(self.display)
+            self._exit_butt.check_hover(pygame.mouse.get_pos())
+
+            pos = pygame.mouse.get_pos()
+            if pygame.mouse.get_focused():
+                self.display.blit(self.cursor, pos)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or (event.type == pygame.USEREVENT and event.button == self._exit_butt):
                     self.loop = False
-                self.butt1.handle_event(event)
-                self.butt2.handle_event(event)
-                self.butt3.handle_event(event)
+                    sys.exit()
+                if event.type == pygame.USEREVENT and event.button == self._authors_butt:
+                    self.show_authours()
+
+                self._start_butt.handle_event(event)
+                self._authors_butt.handle_event(event)
+                self._exit_butt.handle_event(event)
 
             pygame.display.flip()
 
