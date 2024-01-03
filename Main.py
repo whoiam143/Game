@@ -3,7 +3,7 @@ import random
 
 pygame.init()
 
-ARIAL_50 = pygame.font.SysFont("Montserrat", 50)
+FONT_50 = pygame.font.SysFont("Montserrat", 50)
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -38,7 +38,7 @@ class Button:
             current_image = self.image
         screen.blit(current_image, self.rect.topleft)
 
-        text_surface = ARIAL_50.render(self.text, True, WHITE)
+        text_surface = FONT_50.render(self.text, True, WHITE)
         text_rect = text_surface.get_rect(center=self.rect.center)
         screen.blit(text_surface, text_rect)
 
