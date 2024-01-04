@@ -1,7 +1,9 @@
 import pygame
 import sys
 import webbrowser
-
+import random
+import os
+import time
 # from Menu import Menu
 pygame.init()
 
@@ -9,6 +11,26 @@ FONT_50 = pygame.font.SysFont("Montserrat", 50)
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+
+WIDTH = 1920
+HEIGHT = 1080
+window = pygame.display.set_mode((WIDTH, HEIGHT))
+
+
+def load_image(name, colorkey=None):
+        fullname = os.path.join('data', name)
+        if not os.path.isfile(fullname):
+            print(f"Файл с изображением '{fullname}' не найден")
+            sys.exit()
+        image = pygame.image.load(fullname)
+        if colorkey is not None:
+            image = image.convert()
+            if colorkey == -1:
+                colorkey = image.get_at((0, 0))
+            image.set_colorkey(colorkey)
+        else:
+            image = image.convert_alpha()
+        return image
 
 
 class Button:
@@ -58,6 +80,8 @@ class Main:
     def __init__(self):
         self.width = 1920
         self.height = 1080
+
+        self.checking = {}
 
         self.display = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Shoot to win")
@@ -153,12 +177,85 @@ class Main:
                     sys.exit()
                 if event.type == pygame.USEREVENT and event.button == self._authors_butt:
                     self.show_authours()
+                if event.type == pygame.USEREVENT and event.button == self._start_butt:
+                    self.game()
 
                 self._start_butt.handle_event(event)
                 self._authors_butt.handle_event(event)
                 self._exit_butt.handle_event(event)
 
             pygame.display.flip()
+
+    
+    def game(self):
+        sound_path = 'Texture_and_Sound/shoot.mp3'
+        self.sound = pygame.mixer.Sound(sound_path)
+        window.fill((0, 0, 0))
+        shoot_image = load_image('shoot.png')
+        background = pygame.image.load('Texture_and_Sound/level1.png')
+        window.blit(background, [0, 0])
+        background = pygame.transform.scale(background, (WIDTH, HEIGHT))
+        all_sprites = pygame.sprite.Group()
+        all_sprites.draw(window)
+        for i in range(5):
+            Target(all_sprites)
+        all_sprites.draw(window)
+        
+        while True:
+            shoot = pygame.sprite.Sprite(all_sprites)
+            shoot.image = shoot_image
+            shoot.rect = shoot.image.get_rect()
+            shoot.rect.x = 1382
+            shoot.rect.y = 647
+            shoot.kill()
+            pos = pygame.mouse.get_pos()
+            if pygame.mouse.get_focused():
+                self.display.blit(self.cursor, pos)
+            pygame.display.flip()
+            background = pygame.image.load('Texture_and_Sound/level1.png')
+            window.blit(background, [0, 0])
+            background = pygame.transform.scale(background, (WIDTH, HEIGHT))
+            all_sprites.draw(window)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    for bomb in all_sprites:
+                        all_sprites.update(event)
+                    shoot = pygame.sprite.Sprite(all_sprites)
+                    shoot.image = shoot_image
+                    shoot.rect = shoot.image.get_rect()
+                    shoot.rect.x = 1350
+                    shoot.rect.y = 630
+                    self.sound.play()
+                    all_sprites.draw(window)
+                if event.type == pygame.MOUSEMOTION:
+                    pos = pygame.mouse.get_pos()
+                    if pygame.mouse.get_focused():
+                        self.display.blit(self.cursor, pos)
+                shoot.kill()
+                
+
+    
+    
+class Target(pygame.sprite.Sprite):
+    image = load_image("target.png")
+ 
+    def __init__(self, group):
+        super().__init__(group)
+        self.group = group
+        self.image = Target.image
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(400, 400 + 1000 - 100)
+        self.rect.y = random.randrange(172, 720 + 172 - 100)
+ 
+    def update(self, *args):
+        if args and args[0].type == pygame.MOUSEBUTTONDOWN and \
+                self.rect.collidepoint(args[0].pos):
+            self.kill()
+            Target(self.group)
+
+
 
 
 if __name__ == "__main__":
