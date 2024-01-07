@@ -61,7 +61,7 @@ class Button:
 
 
 class Target(pygame.sprite.Sprite):
-    image = pygame.image.load("data/target.png").convert_alpha()
+    image = pygame.image.load("Texture_and_Sound/target.png").convert_alpha()
 
     def __init__(self, group):
         super().__init__(group)
@@ -193,7 +193,7 @@ class Main:
         sound_path = 'Texture_and_Sound/shoot.mp3'
         self.sound = pygame.mixer.Sound(sound_path)
         self.display.fill((0, 0, 0))
-        shoot_image = pygame.image.load("data/shoot.png").convert_alpha()
+        shoot_image = pygame.image.load("Texture_and_Sound/shoot.png").convert_alpha()
         background = pygame.image.load('Texture_and_Sound/level1.png').convert_alpha()
         self.display.blit(background, [0, 0])
         background = pygame.transform.scale(background, (WIDTH, HEIGHT))
