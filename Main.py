@@ -4,7 +4,7 @@ import webbrowser
 import random
 import os
 import time
-# from Menu import Menu
+
 pygame.init()
 
 FONT_50 = pygame.font.SysFont("Montserrat", 50)
@@ -15,22 +15,6 @@ BLACK = (0, 0, 0)
 WIDTH = 1920
 HEIGHT = 1080
 window = pygame.display.set_mode((WIDTH, HEIGHT))
-
-
-def load_image(name, colorkey=None):
-        fullname = os.path.join('data', name)
-        if not os.path.isfile(fullname):
-            print(f"Файл с изображением '{fullname}' не найден")
-            sys.exit()
-        image = pygame.image.load(fullname)
-        if colorkey is not None:
-            image = image.convert()
-            if colorkey == -1:
-                colorkey = image.get_at((0, 0))
-            image.set_colorkey(colorkey)
-        else:
-            image = image.convert_alpha()
-        return image
 
 
 class Button:
@@ -74,6 +58,24 @@ class Button:
             if self.sound:
                 self.sound.play()
             pygame.event.post(pygame.event.Event(pygame.USEREVENT, button=self))
+
+
+class Target(pygame.sprite.Sprite):
+    image = pygame.image.load("data/target.png").convert_alpha()
+
+    def __init__(self, group):
+        super().__init__(group)
+        self.group = group
+        self.image = Target.image
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(400, 400 + 1000 - 100)
+        self.rect.y = random.randrange(172, 720 + 172 - 100)
+
+    def update(self, *args):
+        if args and args[0].type == pygame.MOUSEBUTTONDOWN and \
+                self.rect.collidepoint(args[0].pos):
+            self.kill()
+            Target(self.group)
 
 
 class Main:
@@ -186,22 +188,22 @@ class Main:
 
             pygame.display.flip()
 
-    
     def game(self):
+        loop = True
         sound_path = 'Texture_and_Sound/shoot.mp3'
         self.sound = pygame.mixer.Sound(sound_path)
-        window.fill((0, 0, 0))
-        shoot_image = load_image('shoot.png')
-        background = pygame.image.load('Texture_and_Sound/level1.png')
-        window.blit(background, [0, 0])
+        self.display.fill((0, 0, 0))
+        shoot_image = pygame.image.load("data/shoot.png").convert_alpha()
+        background = pygame.image.load('Texture_and_Sound/level1.png').convert_alpha()
+        self.display.blit(background, [0, 0])
         background = pygame.transform.scale(background, (WIDTH, HEIGHT))
         all_sprites = pygame.sprite.Group()
-        all_sprites.draw(window)
+        all_sprites.draw(self.display)
         for i in range(5):
             Target(all_sprites)
-        all_sprites.draw(window)
-        
-        while True:
+        all_sprites.draw(self.display)
+
+        while loop:
             shoot = pygame.sprite.Sprite(all_sprites)
             shoot.image = shoot_image
             shoot.rect = shoot.image.get_rect()
@@ -213,12 +215,18 @@ class Main:
                 self.display.blit(self.cursor, pos)
             pygame.display.flip()
             background = pygame.image.load('Texture_and_Sound/level1.png')
-            window.blit(background, [0, 0])
-            background = pygame.transform.scale(background, (WIDTH, HEIGHT))
-            all_sprites.draw(window)
+            self.display.blit(background, [0, 0])
+            background = pygame.transform.scale(background, (self.width, self.height))
+            all_sprites.draw(self.display)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    loop = False
                     sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    # Возврат в меню при нажатие на esc
+                    if event.key == pygame.K_ESCAPE:
+                        loop = False
+
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     for bomb in all_sprites:
                         all_sprites.update(event)
@@ -228,34 +236,12 @@ class Main:
                     shoot.rect.x = 1350
                     shoot.rect.y = 630
                     self.sound.play()
-                    all_sprites.draw(window)
+                    all_sprites.draw(self.display)
                 if event.type == pygame.MOUSEMOTION:
                     pos = pygame.mouse.get_pos()
                     if pygame.mouse.get_focused():
                         self.display.blit(self.cursor, pos)
                 shoot.kill()
-                
-
-    
-    
-class Target(pygame.sprite.Sprite):
-    image = load_image("target.png")
- 
-    def __init__(self, group):
-        super().__init__(group)
-        self.group = group
-        self.image = Target.image
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randrange(400, 400 + 1000 - 100)
-        self.rect.y = random.randrange(172, 720 + 172 - 100)
- 
-    def update(self, *args):
-        if args and args[0].type == pygame.MOUSEBUTTONDOWN and \
-                self.rect.collidepoint(args[0].pos):
-            self.kill()
-            Target(self.group)
-
-
 
 
 if __name__ == "__main__":
