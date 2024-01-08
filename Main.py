@@ -16,6 +16,7 @@ WIDTH = 1920
 HEIGHT = 1080
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 
+FPS = 120
 
 class Button:
     def __init__(self, x, y, width, height, text, image_path, hover_impage_path=None, sound_path=None):
@@ -95,12 +96,24 @@ class Main:
 
         self.phon = pygame.image.load("Texture_and_Sound/Menu.png")
 
-        self._start_butt = Button(self.width / 2 - (252 / 2), 500, 252, 75, "Start", "Texture_and_Sound/button.png",
+        self.start_butt = Button(self.width / 2 - (252 / 2), 500, 252, 75, "Start", "Texture_and_Sound/button.png",
                                   "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
-        self._authors_butt = Button(self.width / 2 - (252 / 2), 650, 252, 75, "Authors", "Texture_and_Sound/button.png",
+        self.authors_butt = Button(self.width / 2 - (252 / 2), 650, 252, 75, "Authors", "Texture_and_Sound/button.png",
                                     "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
-        self._exit_butt = Button(self.width / 2 - (252 / 2), 800, 252, 75, "Exit", "Texture_and_Sound/button.png",
+        self.exit_butt = Button(self.width / 2 - (252 / 2), 800, 252, 75, "Exit", "Texture_and_Sound/button.png",
                                  "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
+
+        self.level1 = Button(600, 420, 150, 150, "1", "Texture_and_Sound/level_button.png",
+                                 "Texture_and_Sound/level_button_hover.png", "Texture_and_Sound/click.mp3")
+        self.level2 = Button(900, 420, 150, 150, "2", "Texture_and_Sound/level_button.png",
+                             "Texture_and_Sound/level_button_hover.png", "Texture_and_Sound/click.mp3")
+        self.level3 = Button(1200, 420, 150, 150, "3", "Texture_and_Sound/level_button.png",
+                             "Texture_and_Sound/level_button_hover.png", "Texture_and_Sound/click.mp3")
+        self.level4 = Button(750, 650, 150, 150, "4", "Texture_and_Sound/level_button.png",
+                             "Texture_and_Sound/level_button_hover.png", "Texture_and_Sound/click.mp3")
+        self.level5 = Button(1050, 650, 150, 150, "5", "Texture_and_Sound/level_button.png",
+                             "Texture_and_Sound/level_button_hover.png", "Texture_and_Sound/click.mp3")
+
 
     def show_authours(self):  # Окно авторов
         loop = True
@@ -112,7 +125,7 @@ class Main:
         Emil = FONT_50.render("Cултанов Эмиль", True, BLACK)
         Adil = FONT_50.render("Ахметов Адиль", True, BLACK)
 
-        self.display.blit(self.phon, [0, 0])
+        #self.display.blit(self.phon, [0, 0])
         while loop:
             self.display.blit(self.phon, [0, 0])
 
@@ -162,34 +175,81 @@ class Main:
         while self.loop:
             self.display.blit(self.phon, [0, 0])
 
-            self._start_butt.draw_button(self.display)
-            self._start_butt.check_hover(pygame.mouse.get_pos())
-            self._authors_butt.draw_button(self.display)
-            self._authors_butt.check_hover(pygame.mouse.get_pos())
-            self._exit_butt.draw_button(self.display)
-            self._exit_butt.check_hover(pygame.mouse.get_pos())
+            self.start_butt.draw_button(self.display)
+            self.start_butt.check_hover(pygame.mouse.get_pos())
+            self.authors_butt.draw_button(self.display)
+            self.authors_butt.check_hover(pygame.mouse.get_pos())
+            self.exit_butt.draw_button(self.display)
+            self.exit_butt.check_hover(pygame.mouse.get_pos())
 
             pos = pygame.mouse.get_pos()
             if pygame.mouse.get_focused():
                 self.display.blit(self.cursor, pos)
 
             for event in pygame.event.get():
-                if event.type == pygame.QUIT or (event.type == pygame.USEREVENT and event.button == self._exit_butt):
+                if event.type == pygame.QUIT or (event.type == pygame.USEREVENT and event.button == self.exit_butt):
                     self.loop = False
                     sys.exit()
-                if event.type == pygame.USEREVENT and event.button == self._authors_butt:
+                if event.type == pygame.USEREVENT and event.button == self.authors_butt:
                     self.show_authours()
-                if event.type == pygame.USEREVENT and event.button == self._start_butt:
+                if event.type == pygame.USEREVENT and event.button == self.start_butt:
+                    self.menu_of_levels()
+
+                self.start_butt.handle_event(event)
+                self.authors_butt.handle_event(event)
+                self.exit_butt.handle_event(event)
+
+            pygame.display.flip()
+
+    def menu_of_levels(self):
+        loop = True
+        self.display.fill((255, 255, 255))
+
+        while loop:
+            self.display.blit(self.phon, [0, 0])
+
+            self.level1.draw_button(self.display)
+            self.level1.check_hover(pygame.mouse.get_pos())
+
+            self.level2.draw_button(self.display)
+            self.level2.check_hover(pygame.mouse.get_pos())
+
+            self.level3.draw_button(self.display)
+            self.level3.check_hover(pygame.mouse.get_pos())
+
+            self.level4.draw_button(self.display)
+            self.level4.check_hover(pygame.mouse.get_pos())
+
+            self.level5.draw_button(self.display)
+            self.level5.check_hover(pygame.mouse.get_pos())
+
+            pos = pygame.mouse.get_pos()
+            if pygame.mouse.get_focused():
+                self.display.blit(self.cursor, pos)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    loop = False
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    # Возврат в меню при нажатие на esc
+                    if event.key == pygame.K_ESCAPE:
+                        loop = False
+                if event.type == pygame.USEREVENT and event.button == self.level1:
                     self.game()
 
-                self._start_butt.handle_event(event)
-                self._authors_butt.handle_event(event)
-                self._exit_butt.handle_event(event)
+                self.level1.handle_event(event)
+                self.level2.handle_event(event)
+                self.level3.handle_event(event)
+                self.level4.handle_event(event)
+                self.level5.handle_event(event)
 
+            pygame.display.update()
             pygame.display.flip()
 
     def game(self):
         loop = True
+        clock = pygame.time.Clock()
         sound_path = 'Texture_and_Sound/shoot.mp3'
         self.sound = pygame.mixer.Sound(sound_path)
         self.display.fill((0, 0, 0))
@@ -199,11 +259,12 @@ class Main:
         background = pygame.transform.scale(background, (WIDTH, HEIGHT))
         all_sprites = pygame.sprite.Group()
         all_sprites.draw(self.display)
-        for i in range(5):
+        for i in range(3):
             Target(all_sprites)
         all_sprites.draw(self.display)
 
         while loop:
+            clock.tick(FPS)
             shoot = pygame.sprite.Sprite(all_sprites)
             shoot.image = shoot_image
             shoot.rect = shoot.image.get_rect()
@@ -242,6 +303,7 @@ class Main:
                     if pygame.mouse.get_focused():
                         self.display.blit(self.cursor, pos)
                 shoot.kill()
+            clock.tick(FPS)
 
 
 if __name__ == "__main__":
