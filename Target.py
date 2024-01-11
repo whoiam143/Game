@@ -2,6 +2,13 @@ import pygame
 from random import randrange
 
 
+WIDTH = 1920
+HEIGHT = 1080
+
+pygame.init()
+window = pygame.display.set_mode((WIDTH, HEIGHT))
+
+
 class Target(pygame.sprite.Sprite):
     image = pygame.image.load("Texture_and_Sound/target.png").convert_alpha()
 

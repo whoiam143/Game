@@ -253,7 +253,7 @@ class Main:
             self.sound = pygame.mixer.Sound(sound_path)
             self.display.fill((0, 0, 0))
             shoot_image = pygame.image.load("Texture_and_Sound/shoot.png").convert_alpha()
-            background = pygame.image.load('Texture_and_Sound/level1.png').convert_alpha()
+            background = pygame.image.load('Texture_and_Sound/Phon.png').convert_alpha()
             self.display.blit(background, [0, 0])
             background = pygame.transform.scale(background, (WIDTH, HEIGHT))
             all_sprites = pygame.sprite.Group()
@@ -274,7 +274,7 @@ class Main:
                 if pygame.mouse.get_focused():
                     self.display.blit(self.cursor, pos)
                 pygame.display.flip()
-                background = pygame.image.load('Texture_and_Sound/level1.png')
+                background = pygame.image.load('Texture_and_Sound/Phon.png')
                 self.display.blit(background, [0, 0])
                 background = pygame.transform.scale(background, (self.width, self.height))
                 all_sprites.draw(self.display)
