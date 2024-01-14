@@ -1,26 +1,70 @@
 import pygame
 import sys
 import webbrowser
-from Target import Target
-from Button import Button
+import random
 
+
+WIDTH = 1920
+HEIGHT = 1080
+
+pygame.init()
+window = pygame.display.set_mode((WIDTH, HEIGHT))
 
 FONT_50 = pygame.font.SysFont("Montserrat", 50)
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-WIDTH = 1920
-HEIGHT = 1080
-
 FPS = 120
 
-pygame.init()
-window = pygame.display.set_mode((WIDTH, HEIGHT))
+hits_count = 0
+
+class Button:
+    def __init__(self, x, y, width, height, text, image_path, hover_impage_path=None, sound_path=None):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.text = text
+
+        self._image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self._image, (width, height))
+        self.hover_image = self.image
+        if hover_impage_path:
+            self.hover_image = pygame.image.load(hover_impage_path)
+            self.hover_image = pygame.transform.scale(self.hover_image, (width, height))
+
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.sound = None
+        if sound_path:
+            self.sound = pygame.mixer.Sound(sound_path)
+
+        self.is_hovered = False
+
+    def draw_button(self, screen):  # Метод нарисовки кнопки
+        if self.is_hovered:
+            current_image = self.hover_image
+        else:
+            current_image = self.image
+        screen.blit(current_image, self.rect.topleft)
+
+        text_surface = FONT_50.render(self.text, True, WHITE)
+        text_rect = text_surface.get_rect(center=self.rect.center)
+        screen.blit(text_surface, text_rect)
+
+    def check_hover(self, mouse_pos):  # Проверка ли мышь на кнопке
+        self.is_hovered = self.rect.collidepoint(mouse_pos)
+
+    def handle_event(self, event):  # Звук при нажатие на кнопку
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.is_hovered:
+            if self.sound:
+                self.sound.play()
+            pygame.event.post(pygame.event.Event(pygame.USEREVENT, button=self))
 
 
 class Main:
     def __init__(self):
+        global hits_count
         self.width = 1920
         self.height = 1080
 
@@ -122,7 +166,8 @@ class Main:
             self.exit_butt.draw_button(self.display)
             self.exit_butt.check_hover(pygame.mouse.get_pos())
 
-            pos = pygame.mouse.get_pos()
+            x,y = pygame.mouse.get_pos()
+            pos = x - 25, y - 25
             if pygame.mouse.get_focused():
                 self.display.blit(self.cursor, pos)
 
@@ -163,7 +208,8 @@ class Main:
             self.level5.draw_button(self.display)
             self.level5.check_hover(pygame.mouse.get_pos())
 
-            pos = pygame.mouse.get_pos()
+            x, y = pygame.mouse.get_pos()
+            pos = x - 25, y - 25
             if pygame.mouse.get_focused():
                 self.display.blit(self.cursor, pos)
 
@@ -188,6 +234,7 @@ class Main:
             pygame.display.flip()
 
     def game_1(self):
+        hits_count = 0
         loop = True
         clock = pygame.time.Clock()
         sound_path = 'Texture_and_Sound/shoot.mp3'
@@ -211,9 +258,9 @@ class Main:
             shoot.rect.x = 1382
             shoot.rect.y = 647
             shoot.kill()
-            pos = pygame.mouse.get_pos()
+            x, y = pygame.mouse.get_pos()
             if pygame.mouse.get_focused():
-                self.display.blit(self.cursor, pos)
+                self.display.blit(self.cursor, (x - 25, y - 25))
             pygame.display.flip()
             background = pygame.image.load('Texture_and_Sound/level1.png')
             self.display.blit(background, [0, 0])
@@ -239,9 +286,9 @@ class Main:
                     self.sound.play()
                     all_sprites.draw(self.display)
                 if event.type == pygame.MOUSEMOTION:
-                    pos = pygame.mouse.get_pos()
+                    x, y = pygame.mouse.get_pos()
                     if pygame.mouse.get_focused():
-                        self.display.blit(self.cursor, pos)
+                        self.display.blit(self.cursor, (x - 25, y - 25))
                 shoot.kill()
             clock.tick(FPS)
 
@@ -303,6 +350,28 @@ class Main:
                             self.display.blit(self.cursor, pos)
                     shoot.kill()
                 clock.tick(FPS)
+
+
+class Target(pygame.sprite.Sprite):
+    image = pygame.image.load("Texture_and_Sound/target.png").convert_alpha()
+
+    def __init__(self, group):
+        super().__init__(group)
+        self.group = group
+        self.image = Target.image
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(400, 400 + 1000 - 100)
+        self.rect.y = random.randrange(172, 720 + 172 - 100)
+
+    def update(self, *args):
+        global hits_count
+        if args and args[0].type == pygame.MOUSEBUTTONDOWN and \
+                self.rect.collidepoint(args[0].pos):
+            self.kill()
+            hits_count += 1
+            print(hits_count)
+            Target(self.group)
+
 
 if __name__ == "__main__":
     game = Main()
