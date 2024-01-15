@@ -191,6 +191,7 @@ class Main:
             pygame.display.flip()
     
     def timer(self, start_time):
+        print(start_time)
         current_time = int(time.time() - start_time)
         self.sec = current_time
         if current_time >= 60:
@@ -211,6 +212,7 @@ class Main:
                 current_time = f"{self.minut}:{self.sec}"
 
         self.display.blit(FONT_50.render(current_time, True, WHITE), (0, 100))
+        return start_time
 
 
     def menu_of_levels(self):
@@ -287,7 +289,7 @@ class Main:
             shoot.rect.x = 1382
             shoot.rect.y = 647
             shoot.kill()
-            self.timer(start_time)
+            start_time = self.timer(start_time)
             x, y = pygame.mouse.get_pos()
             if pygame.mouse.get_focused():
                 self.display.blit(self.cursor, (x - 25, y - 25))
