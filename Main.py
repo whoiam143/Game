@@ -2,6 +2,7 @@ import pygame
 import sys
 import webbrowser
 import random
+import time
 
 
 WIDTH = 1920
@@ -77,6 +78,9 @@ class Main:
 
         self.cursor = pygame.image.load("Texture_and_Sound/pricel.png").convert_alpha()
         pygame.mouse.set_visible(False)
+
+        self.sec = 0
+        self.minut = 0
 
         self.phon = pygame.image.load("Texture_and_Sound/Menu.png")
 
@@ -186,6 +190,27 @@ class Main:
 
             pygame.display.flip()
 
+    def timer(self):
+        self.sec += 1
+        if self.sec == 60:
+            self.sec = 0
+            self.minut += 1
+
+        current_time = ""
+
+        if self.sec < 10:
+            if self.minut < 10:
+                current_time = f"0{self.minut}:0{self.sec}"
+            else:
+                current_time = f"{self.minut}:0{self.sec}"
+        if self.sec >= 10:
+            if self.minut < 10:
+                current_time = f"0{self.minut}:{self.sec}"
+            else:
+                current_time = f"{self.minut}:{self.sec}"
+
+        self.display.blit(FONT_50.render(current_time, True, WHITE), (0, 100))
+
     def menu_of_levels(self):
         loop = True
         self.display.fill((255, 255, 255))
@@ -235,6 +260,7 @@ class Main:
 
     def game_1(self):
         hits_count = 0
+        shoot_count = 0
         loop = True
         clock = pygame.time.Clock()
         sound_path = 'Texture_and_Sound/shoot.mp3'
@@ -258,6 +284,8 @@ class Main:
             shoot.rect.x = 1382
             shoot.rect.y = 647
             shoot.kill()
+            self.timer()
+            #time.sleep(1000)
             x, y = pygame.mouse.get_pos()
             if pygame.mouse.get_focused():
                 self.display.blit(self.cursor, (x - 25, y - 25))
@@ -266,6 +294,7 @@ class Main:
             self.display.blit(background, [0, 0])
             background = pygame.transform.scale(background, (self.width, self.height))
             all_sprites.draw(self.display)
+            self.display.blit(FONT_50.render(f"Hits:{hits_count}", True, WHITE), (0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     loop = False
@@ -278,6 +307,7 @@ class Main:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     for bomb in all_sprites:
                         all_sprites.update(event)
+                        shoot_count += 1
                     shoot = pygame.sprite.Sprite(all_sprites)
                     shoot.image = shoot_image
                     shoot.rect = shoot.image.get_rect()
@@ -291,6 +321,7 @@ class Main:
                         self.display.blit(self.cursor, (x - 25, y - 25))
                 shoot.kill()
             clock.tick(FPS)
+        pygame.display.flip()
 
 
         def game_2(self):
