@@ -189,15 +189,16 @@ class Main:
                 self.exit_butt.handle_event(event)
 
             pygame.display.flip()
-
-    def timer(self):
-        self.sec += 1
-        if self.sec == 60:
+    
+    def timer(self, start_time):
+        current_time = int(time.time() - start_time)
+        self.sec = current_time
+        if current_time >= 60:
             self.sec = 0
+            start_time += current_time
             self.minut += 1
-
-        current_time = ""
-
+            current_time = 0
+            
         if self.sec < 10:
             if self.minut < 10:
                 current_time = f"0{self.minut}:0{self.sec}"
@@ -210,6 +211,7 @@ class Main:
                 current_time = f"{self.minut}:{self.sec}"
 
         self.display.blit(FONT_50.render(current_time, True, WHITE), (0, 100))
+
 
     def menu_of_levels(self):
         loop = True
@@ -272,6 +274,7 @@ class Main:
         background = pygame.transform.scale(background, (WIDTH, HEIGHT))
         all_sprites = pygame.sprite.Group()
         all_sprites.draw(self.display)
+        start_time = time.time()
         for i in range(3):
             Target(all_sprites)
         all_sprites.draw(self.display)
@@ -284,8 +287,7 @@ class Main:
             shoot.rect.x = 1382
             shoot.rect.y = 647
             shoot.kill()
-            self.timer()
-            #time.sleep(1000)
+            self.timer(start_time)
             x, y = pygame.mouse.get_pos()
             if pygame.mouse.get_focused():
                 self.display.blit(self.cursor, (x - 25, y - 25))
