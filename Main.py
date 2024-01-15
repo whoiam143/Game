@@ -263,7 +263,6 @@ class Main:
             pygame.display.flip()
 
     def game_1(self):
-        hits_count = 0
         shoot_count = 0
         loop = True
         clock = pygame.time.Clock()
