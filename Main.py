@@ -4,6 +4,7 @@ import webbrowser
 import random
 import time
 
+from db import add_result, results, create_bd
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -20,6 +21,8 @@ BLACK = (0, 0, 0)
 FPS = 120
 
 hits_count = 0
+shoot_count = 0
+
 
 class Button:
     def __init__(self, x, y, width, height, text, image_path, hover_impage_path=None, sound_path=None):
@@ -84,6 +87,7 @@ class Main:
         self.minut = 0
 
         self.time = ''
+        create_bd()
 
         self.phon = pygame.image.load("Texture_and_Sound/Menu.png")
 
@@ -194,7 +198,7 @@ class Main:
             pygame.display.flip()
     
     def timer(self, start_time):
-        print(start_time)
+        #print(start_time)
         current_time = int(time.time() - start_time)
         self.sec = current_time
         if current_time >= 60:
@@ -255,7 +259,6 @@ class Main:
                         loop = False
                 if event.type == pygame.USEREVENT and event.button == self.level1:
                     self.game_1()
-                    self.show_results()
 
                 self.level1.handle_event(event)
                 self.level2.handle_event(event)
@@ -265,7 +268,18 @@ class Main:
 
             pygame.display.update()
             pygame.display.flip()
-    
+
+    def save_results(self, level):
+        accuracy = 0
+        global shoot_count
+        try:
+            accuracy = int(round(hits_count / (shoot_count / 3), 2) * 100)
+        except ZeroDivisionError:
+            pass
+        if accuracy > 100:
+            accuracy = 100
+        add_result(self.time, level, hits_count, f'{accuracy}%')
+
     def show_results(self):
         global hits_count
 
@@ -274,14 +288,18 @@ class Main:
 
         link_color1 = (0, 0, 0)
 
-        phon = pygame.image.load("Texture_and_Sound/Menu.png").convert_alpha()
+        accuracy = int(round(hits_count / (shoot_count / 3), 2) * 100)
+        if accuracy > 100:
+            accuracy = 100
 
+        phon = pygame.image.load("Texture_and_Sound/Menu.png").convert_alpha()
 
         while loop:
             self.display.blit(phon, [0, 0])
 
-            self.display.blit(FONT_100.render(f"Score:{hits_count}", True, link_color1), (850, 500))
-            self.display.blit(FONT_50.render(f"Time:{self.time}", True, link_color1), (880, 600))
+            self.display.blit(FONT_100.render(f"Score:{hits_count}", True, link_color1), (850, 450))
+            self.display.blit(FONT_50.render(f"Time:{self.time}", True, link_color1), (880, 545))
+            self.display.blit(FONT_50.render(f"Accuracy:{accuracy}%", True, link_color1), (850, 605))
 
             pos = pygame.mouse.get_pos()
             if pygame.mouse.get_focused():
@@ -301,7 +319,7 @@ class Main:
         hits_count = 0
 
     def game_1(self):
-        shoot_count = 0
+        global shoot_count
         loop = True
         clock = pygame.time.Clock()
         sound_path = 'Texture_and_Sound/shoot.mp3'
@@ -344,11 +362,13 @@ class Main:
                     # Возврат в меню при нажатие на esc
                     if event.key == pygame.K_ESCAPE:
                         loop = False
+                        self.save_results(1)
+                        self.show_results()
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     for bomb in all_sprites:
                         all_sprites.update(event)
-                    shoot_count += 1
+                        shoot_count += 1
                     shoot = pygame.sprite.Sprite(all_sprites)
                     shoot.image = shoot_image
                     shoot.rect = shoot.image.get_rect()
