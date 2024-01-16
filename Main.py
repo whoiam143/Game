@@ -12,6 +12,7 @@ pygame.init()
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 
 FONT_50 = pygame.font.SysFont("Montserrat", 50)
+FONT_100 = pygame.font.SysFont("Montserrat", 100)
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -81,6 +82,8 @@ class Main:
 
         self.sec = 0
         self.minut = 0
+
+        self.time = ''
 
         self.phon = pygame.image.load("Texture_and_Sound/Menu.png")
 
@@ -202,14 +205,14 @@ class Main:
             
         if self.sec < 10:
             if self.minut < 10:
-                current_time = f"0{self.minut}:0{self.sec}"
+                self.time = current_time = f"0{self.minut}:0{self.sec}"
             else:
-                current_time = f"{self.minut}:0{self.sec}"
+                self.time = current_time = f"{self.minut}:0{self.sec}"
         if self.sec >= 10:
             if self.minut < 10:
-                current_time = f"0{self.minut}:{self.sec}"
+                self.time = current_time = f"0{self.minut}:{self.sec}"
             else:
-                current_time = f"{self.minut}:{self.sec}"
+                self.time = current_time = f"{self.minut}:{self.sec}"
 
         self.display.blit(FONT_50.render(current_time, True, WHITE), (0, 100))
         return start_time
@@ -252,6 +255,7 @@ class Main:
                         loop = False
                 if event.type == pygame.USEREVENT and event.button == self.level1:
                     self.game_1()
+                    self.show_results()
 
                 self.level1.handle_event(event)
                 self.level2.handle_event(event)
@@ -261,6 +265,40 @@ class Main:
 
             pygame.display.update()
             pygame.display.flip()
+    
+    def show_results(self):
+        global hits_count
+
+        loop = True
+        self.display.fill((255, 255, 255))
+
+        link_color1 = (0, 0, 0)
+
+        phon = pygame.image.load("Texture_and_Sound/Menu.png").convert_alpha()
+
+
+        while loop:
+            self.display.blit(phon, [0, 0])
+
+            self.display.blit(FONT_100.render(f"Score:{hits_count}", True, link_color1), (850, 500))
+            self.display.blit(FONT_50.render(f"Time:{self.time}", True, link_color1), (880, 600))
+
+            pos = pygame.mouse.get_pos()
+            if pygame.mouse.get_focused():
+                self.display.blit(self.cursor, pos)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    loop = False
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    # Возврат в меню при нажатие на esc
+                    if event.key == pygame.K_ESCAPE:
+                        loop = False
+            
+            pygame.display.flip()
+        
+        hits_count = 0
 
     def game_1(self):
         shoot_count = 0
@@ -310,7 +348,7 @@ class Main:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     for bomb in all_sprites:
                         all_sprites.update(event)
-                        shoot_count += 1
+                    shoot_count += 1
                     shoot = pygame.sprite.Sprite(all_sprites)
                     shoot.image = shoot_image
                     shoot.rect = shoot.image.get_rect()
