@@ -244,9 +244,9 @@ class Main:
                     if event.key == pygame.K_ESCAPE:
                         loop = False
                 if event.type == pygame.USEREVENT and event.button == self.level1:
-                    self.game_1()
+                    self.level_1()
                 if event.type == pygame.USEREVENT and event.button == self.level2:
-                    self.game_2()
+                    self.level_2()
 
                 self.level1.handle_event(event)
                 self.level2.handle_event(event)
@@ -307,7 +307,7 @@ class Main:
         
         hits_count = 0
 
-    def game_1(self):
+    def level_1(self):
         global shoot_count
         loop = True
         clock = pygame.time.Clock()
@@ -375,7 +375,7 @@ class Main:
         pygame.display.flip()
 
 
-    def game_2(self):
+    def level_2(self):
         global shoot_count
         loop = True
         clock = pygame.time.Clock()
