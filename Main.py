@@ -267,6 +267,7 @@ class Main:
 
     def show_results(self):
         global hits_count
+        global shoot_count
 
         loop = True
         self.display.fill((255, 255, 255))
@@ -306,6 +307,7 @@ class Main:
             pygame.display.flip()
         
         hits_count = 0
+        shoot_count = 0
 
     def level_1(self):
         global shoot_count
