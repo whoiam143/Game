@@ -197,7 +197,7 @@ class Main:
 
             pygame.display.flip()
     
-    def timer(self, start_time):
+    def timer(self, start_time, color):
         #print(start_time)
         current_time = int(time.time() - start_time)
         self.sec = current_time
@@ -218,7 +218,7 @@ class Main:
             else:
                 self.time = current_time = f"{self.minut}:{self.sec}"
 
-        self.display.blit(FONT_50.render(current_time, True, WHITE), (0, 100))
+        self.display.blit(FONT_50.render(current_time, True, color), (0, 100))
         return start_time
 
 
@@ -259,6 +259,8 @@ class Main:
                         loop = False
                 if event.type == pygame.USEREVENT and event.button == self.level1:
                     self.game_1()
+                if event.type == pygame.USEREVENT and event.button == self.level2:
+                    self.game_2()
 
                 self.level1.handle_event(event)
                 self.level2.handle_event(event)
@@ -344,7 +346,7 @@ class Main:
             shoot.rect.x = 1382
             shoot.rect.y = 647
             shoot.kill()
-            start_time = self.timer(start_time)
+            start_time = self.timer(start_time, WHITE)
             x, y = pygame.mouse.get_pos()
             if pygame.mouse.get_focused():
                 self.display.blit(self.cursor, (x - 25, y - 25))
@@ -385,63 +387,71 @@ class Main:
         pygame.display.flip()
 
 
-        def game_2(self):
-            loop = True
-            clock = pygame.time.Clock()
-            sound_path = 'Texture_and_Sound/shoot.mp3'
-            self.sound = pygame.mixer.Sound(sound_path)
-            self.display.fill((0, 0, 0))
-            shoot_image = pygame.image.load("Texture_and_Sound/shoot.png").convert_alpha()
-            background = pygame.image.load('Texture_and_Sound/Phon.png').convert_alpha()
+    def game_2(self):
+        global shoot_count
+        loop = True
+        clock = pygame.time.Clock()
+        sound_path = 'Texture_and_Sound/shoot.mp3'
+        self.sound = pygame.mixer.Sound(sound_path)
+        self.display.fill((0, 0, 0))
+        shoot_image = pygame.image.load("Texture_and_Sound/shoot.png").convert_alpha()
+        background = pygame.image.load('Texture_and_Sound/level2.jpg').convert_alpha()
+        self.display.blit(background, [0, 0])
+        background = pygame.transform.scale(background, (WIDTH, HEIGHT))
+        all_sprites = pygame.sprite.Group()
+        all_sprites.draw(self.display)
+        start_time = time.time()
+        for i in range(3):
+            Target2(all_sprites)
+        all_sprites.draw(self.display)
+
+        while loop:
+            clock.tick(FPS)
+            shoot = pygame.sprite.Sprite(all_sprites)
+            shoot.image = shoot_image
+            shoot.rect = shoot.image.get_rect()
+            shoot.rect.x = 1382
+            shoot.rect.y = 647
+            shoot.kill()
+            start_time = self.timer(start_time, BLACK)
+            x, y = pygame.mouse.get_pos()
+            if pygame.mouse.get_focused():
+                self.display.blit(self.cursor, (x - 25, y - 25))
+            pygame.display.flip()
+            background = pygame.image.load('Texture_and_Sound/level2.jpg')
             self.display.blit(background, [0, 0])
-            background = pygame.transform.scale(background, (WIDTH, HEIGHT))
-            all_sprites = pygame.sprite.Group()
+            background = pygame.transform.scale(background, (self.width, self.height))
             all_sprites.draw(self.display)
-            for i in range(3):
-                Target(all_sprites)
-            all_sprites.draw(self.display)
-
-            while loop:
-                clock.tick(FPS)
-                shoot = pygame.sprite.Sprite(all_sprites)
-                shoot.image = shoot_image
-                shoot.rect = shoot.image.get_rect()
-                shoot.rect.x = 1382
-                shoot.rect.y = 647
-                shoot.kill()
-                pos = pygame.mouse.get_pos()
-                if pygame.mouse.get_focused():
-                    self.display.blit(self.cursor, pos)
-                pygame.display.flip()
-                background = pygame.image.load('Texture_and_Sound/Phon.png')
-                self.display.blit(background, [0, 0])
-                background = pygame.transform.scale(background, (self.width, self.height))
-                all_sprites.draw(self.display)
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
+            self.display.blit(FONT_50.render(f"Hits:{hits_count}", True, BLACK), (0, 0))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    loop = False
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    # Возврат в меню при нажатие на esc
+                    if event.key == pygame.K_ESCAPE:
                         loop = False
-                        sys.exit()
-                    if event.type == pygame.KEYDOWN:
-                        # Возврат в меню при нажатие на esc
-                        if event.key == pygame.K_ESCAPE:
-                            loop = False
+                        self.save_results(2)
+                        self.show_results()
 
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        for bomb in all_sprites:
-                            all_sprites.update(event)
-                        shoot = pygame.sprite.Sprite(all_sprites)
-                        shoot.image = shoot_image
-                        shoot.rect = shoot.image.get_rect()
-                        shoot.rect.x = 1350
-                        shoot.rect.y = 630
-                        self.sound.play()
-                        all_sprites.draw(self.display)
-                    if event.type == pygame.MOUSEMOTION:
-                        pos = pygame.mouse.get_pos()
-                        if pygame.mouse.get_focused():
-                            self.display.blit(self.cursor, pos)
-                    shoot.kill()
-                clock.tick(FPS)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    for bomb in all_sprites:
+                        all_sprites.update(event)
+                        shoot_count += 1
+                    shoot = pygame.sprite.Sprite(all_sprites)
+                    shoot.image = shoot_image
+                    shoot.rect = shoot.image.get_rect()
+                    shoot.rect.x = 1350
+                    shoot.rect.y = 630
+                    self.sound.play()
+                    all_sprites.draw(self.display)
+                if event.type == pygame.MOUSEMOTION:
+                    x, y = pygame.mouse.get_pos()
+                    if pygame.mouse.get_focused():
+                        self.display.blit(self.cursor, (x - 25, y - 25))
+                shoot.kill()
+            clock.tick(FPS)
+        pygame.display.flip()
 
 
 class Target(pygame.sprite.Sprite):
@@ -463,6 +473,27 @@ class Target(pygame.sprite.Sprite):
             hits_count += 1
             print(hits_count)
             Target(self.group)
+
+
+class Target2(pygame.sprite.Sprite):
+    image = pygame.image.load("Texture_and_Sound/target2.png").convert_alpha()
+
+    def __init__(self, group):
+        super().__init__(group)
+        self.group = group
+        self.image = Target2.image
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(0, 1920 - 100)
+        self.rect.y = random.randrange(180, 720 + 180 - 200)
+
+    def update(self, *args):
+        global hits_count
+        if args and args[0].type == pygame.MOUSEBUTTONDOWN and \
+                self.rect.collidepoint(args[0].pos):
+            self.kill()
+            hits_count += 1
+            print(hits_count)
+            Target2(self.group)
 
 
 if __name__ == "__main__":
