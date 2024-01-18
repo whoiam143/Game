@@ -1,10 +1,10 @@
-import random
-import sys
-import time
-import webbrowser
-
 import pygame
-from db import add_result, create_bd
+import sys
+import webbrowser
+import random
+import time
+
+from db import add_result, results, create_bd
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -13,6 +13,7 @@ pygame.init()
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 
 FONT_50 = pygame.font.SysFont("Montserrat", 50)
+FONT_75 = pygame.font.SysFont("Montserrat", 75)
 FONT_100 = pygame.font.SysFont("Montserrat", 100)
 
 WHITE = (255, 255, 255)
@@ -92,22 +93,17 @@ class Main:
         self.phon = pygame.image.load("Texture_and_Sound/Menu.png")
 
         self.start_butt = Button(self.width / 2 - (252 / 2), 500, 252, 75, "Start", "Texture_and_Sound/button.png",
-                                 "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
+                                  "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
         self.authors_butt = Button(self.width / 2 - (252 / 2), 650, 252, 75, "Authors", "Texture_and_Sound/button.png",
-                                   "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
+                                    "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
         self.exit_butt = Button(self.width / 2 - (252 / 2), 800, 252, 75, "Exit", "Texture_and_Sound/button.png",
-                                "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
+                                 "Texture_and_Sound/button_hover.png", "Texture_and_Sound/click.mp3")
 
-        self.level1 = Button(600, 420, 150, 150, "1", "Texture_and_Sound/level_button.png",
+        self.level1 = Button(750, 460, 150, 150, "1", "Texture_and_Sound/level_button.png",
+                                 "Texture_and_Sound/level_button_hover.png", "Texture_and_Sound/click.mp3")
+        self.level2 = Button(1000, 460, 150, 150, "2", "Texture_and_Sound/level_button.png",
                              "Texture_and_Sound/level_button_hover.png", "Texture_and_Sound/click.mp3")
-        self.level2 = Button(900, 420, 150, 150, "2", "Texture_and_Sound/level_button.png",
-                             "Texture_and_Sound/level_button_hover.png", "Texture_and_Sound/click.mp3")
-        self.level3 = Button(1200, 420, 150, 150, "3", "Texture_and_Sound/level_button.png",
-                             "Texture_and_Sound/level_button_hover.png", "Texture_and_Sound/click.mp3")
-        self.level4 = Button(750, 650, 150, 150, "4", "Texture_and_Sound/level_button.png",
-                             "Texture_and_Sound/level_button_hover.png", "Texture_and_Sound/click.mp3")
-        self.level5 = Button(1050, 650, 150, 150, "5", "Texture_and_Sound/level_button.png",
-                             "Texture_and_Sound/level_button_hover.png", "Texture_and_Sound/click.mp3")
+
 
     def show_authours(self):  # Окно авторов
         loop = True
@@ -119,7 +115,7 @@ class Main:
         Emil = FONT_50.render("Cултанов Эмиль", True, BLACK)
         Adil = FONT_50.render("Ахметов Адиль", True, BLACK)
 
-        # self.display.blit(self.phon, [0, 0])
+        #self.display.blit(self.phon, [0, 0])
         while loop:
             self.display.blit(self.phon, [0, 0])
 
@@ -176,7 +172,7 @@ class Main:
             self.exit_butt.draw_button(self.display)
             self.exit_butt.check_hover(pygame.mouse.get_pos())
 
-            x, y = pygame.mouse.get_pos()
+            x,y = pygame.mouse.get_pos()
             pos = x - 25, y - 25
             if pygame.mouse.get_focused():
                 self.display.blit(self.cursor, pos)
@@ -195,9 +191,9 @@ class Main:
                 self.exit_butt.handle_event(event)
 
             pygame.display.flip()
-
+    
     def timer(self, start_time, color):
-        # print(start_time)
+        #print(start_time)
         current_time = int(time.time() - start_time)
         self.sec = current_time
         if current_time >= 60:
@@ -205,7 +201,7 @@ class Main:
             start_time += current_time
             self.minut += 1
             current_time = 0
-
+            
         if self.sec < 10:
             if self.minut < 10:
                 self.time = current_time = f"0{self.minut}:0{self.sec}"
@@ -217,8 +213,9 @@ class Main:
             else:
                 self.time = current_time = f"{self.minut}:{self.sec}"
 
-        self.display.blit(FONT_50.render(current_time, True, color), (0, 100))
+        self.display.blit(FONT_75.render(current_time, True, color), (860, 1000))
         return start_time
+
 
     def menu_of_levels(self):
         loop = True
@@ -232,15 +229,6 @@ class Main:
 
             self.level2.draw_button(self.display)
             self.level2.check_hover(pygame.mouse.get_pos())
-
-            self.level3.draw_button(self.display)
-            self.level3.check_hover(pygame.mouse.get_pos())
-
-            self.level4.draw_button(self.display)
-            self.level4.check_hover(pygame.mouse.get_pos())
-
-            self.level5.draw_button(self.display)
-            self.level5.check_hover(pygame.mouse.get_pos())
 
             x, y = pygame.mouse.get_pos()
             pos = x - 25, y - 25
@@ -262,9 +250,6 @@ class Main:
 
                 self.level1.handle_event(event)
                 self.level2.handle_event(event)
-                self.level3.handle_event(event)
-                self.level4.handle_event(event)
-                self.level5.handle_event(event)
 
             pygame.display.update()
             pygame.display.flip()
@@ -287,8 +272,12 @@ class Main:
         self.display.fill((255, 255, 255))
 
         link_color1 = (0, 0, 0)
+        accuracy = 0
 
-        accuracy = int(round(hits_count / (shoot_count / 3), 2) * 100)
+        try:
+            accuracy = int(round(hits_count / (shoot_count / 3), 2) * 100)
+        except ZeroDivisionError:
+            pass
         if accuracy > 100:
             accuracy = 100
 
@@ -313,9 +302,9 @@ class Main:
                     # Возврат в меню при нажатие на esc
                     if event.key == pygame.K_ESCAPE:
                         loop = False
-
+            
             pygame.display.flip()
-
+        
         hits_count = 0
 
     def game_1(self):
@@ -353,7 +342,7 @@ class Main:
             self.display.blit(background, [0, 0])
             background = pygame.transform.scale(background, (self.width, self.height))
             all_sprites.draw(self.display)
-            self.display.blit(FONT_50.render(f"Hits:{hits_count}", True, WHITE), (0, 0))
+            self.display.blit(FONT_75.render(f"Hits:{hits_count}", True, WHITE), (50, 50))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     loop = False
@@ -383,6 +372,7 @@ class Main:
                 shoot.kill()
             clock.tick(FPS)
         pygame.display.flip()
+
 
     def game_2(self):
         global shoot_count
@@ -419,7 +409,7 @@ class Main:
             self.display.blit(background, [0, 0])
             background = pygame.transform.scale(background, (self.width, self.height))
             all_sprites.draw(self.display)
-            self.display.blit(FONT_50.render(f"Hits:{hits_count}", True, BLACK), (0, 0))
+            self.display.blit(FONT_75.render(f"Hits:{hits_count}", True, BLACK), (50, 50))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     loop = False
@@ -473,7 +463,8 @@ class Target(pygame.sprite.Sprite):
 
 
 class Target2(pygame.sprite.Sprite):
-    image = pygame.image.load("Texture_and_Sound/target2.png").convert_alpha()
+    random_ballon = random.randint(1, 3)
+    image = pygame.image.load(f"Texture_and_Sound/balloon{random_ballon}.png").convert_alpha()
 
     def __init__(self, group):
         super().__init__(group)
