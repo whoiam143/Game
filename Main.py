@@ -308,6 +308,8 @@ class Main:
         
         hits_count = 0
         shoot_count = 0
+        self.sec = 0
+        self.minut = 0
 
     def level_1(self):
         global shoot_count
