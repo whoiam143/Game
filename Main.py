@@ -322,7 +322,7 @@ class Main:
         all_sprites.draw(self.display)
         start_time = time.time()
         for i in range(3):
-            Target(all_sprites)
+            Target(all_sprites, None, 1)
         all_sprites.draw(self.display)
 
         while loop:
@@ -342,6 +342,7 @@ class Main:
             self.display.blit(background, [0, 0])
             background = pygame.transform.scale(background, (self.width, self.height))
             all_sprites.draw(self.display)
+            self.display.blit(FONT_50.render("Press ESC to end the game", True, WHITE), (100, 1000))
             self.display.blit(FONT_75.render(f"Hits:{hits_count}", True, WHITE), (50, 50))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -388,8 +389,11 @@ class Main:
         all_sprites = pygame.sprite.Group()
         all_sprites.draw(self.display)
         start_time = time.time()
+        self.display.blit(FONT_50.render("Press ESC to end the game", True, BLACK), (0, 0))
         for i in range(3):
-            Target2(all_sprites)
+            random_ballon = random.randint(1, 3)
+            path = f"Texture_and_Sound/balloon{random_ballon}.png"
+            Target(all_sprites, path, 2)
         all_sprites.draw(self.display)
 
         while loop:
@@ -409,6 +413,7 @@ class Main:
             self.display.blit(background, [0, 0])
             background = pygame.transform.scale(background, (self.width, self.height))
             all_sprites.draw(self.display)
+            self.display.blit(FONT_50.render("Press ESC to end the game", True, BLACK), (100, 1000))
             self.display.blit(FONT_75.render(f"Hits:{hits_count}", True, BLACK), (50, 50))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -442,12 +447,17 @@ class Main:
 
 
 class Target(pygame.sprite.Sprite):
-    image = pygame.image.load("Texture_and_Sound/target.png").convert_alpha()
 
-    def __init__(self, group):
+    def __init__(self, group, path_to_pic=None, level=1):
         super().__init__(group)
+        if level == 1:
+            path_to_pic = "Texture_and_Sound/target.png"
+        elif level == 2:
+            path_to_pic = path_to_pic
+        image = pygame.image.load(path_to_pic).convert_alpha()
+        self.level = level
         self.group = group
-        self.image = Target.image
+        self.image = image
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(400, 400 + 1000 - 100)
         self.rect.y = random.randrange(172, 720 + 172 - 100)
@@ -459,29 +469,10 @@ class Target(pygame.sprite.Sprite):
             self.kill()
             hits_count += 1
             print(hits_count)
-            Target(self.group)
-
-
-class Target2(pygame.sprite.Sprite):
-    random_ballon = random.randint(1, 3)
-    image = pygame.image.load(f"Texture_and_Sound/balloon{random_ballon}.png").convert_alpha()
-
-    def __init__(self, group):
-        super().__init__(group)
-        self.group = group
-        self.image = Target2.image
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randrange(0, 1920 - 100)
-        self.rect.y = random.randrange(180, 720 + 180 - 200)
-
-    def update(self, *args):
-        global hits_count
-        if args and args[0].type == pygame.MOUSEBUTTONDOWN and \
-                self.rect.collidepoint(args[0].pos):
-            self.kill()
-            hits_count += 1
-            print(hits_count)
-            Target2(self.group)
+            if self.level == 2:
+                random_ballon = random.randint(1, 3)
+                path = f"Texture_and_Sound/balloon{random_ballon}.png"
+                Target(self.group, path, 2)
 
 
 if __name__ == "__main__":
