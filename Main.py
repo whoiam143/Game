@@ -109,8 +109,8 @@ class Main:
         loop = True
         self.display.fill((255, 255, 255))
 
-        link_color1 = (0, 0, 0)
-        link_color2 = (0, 0, 0)
+        link_color1 = (70, 30, 220)
+        link_color2 = (70, 30, 220)
 
         Emil = FONT_50.render("Cултанов Эмиль", True, BLACK)
         Adil = FONT_50.render("Ахметов Адиль", True, BLACK)
@@ -149,14 +149,14 @@ class Main:
 
             # Если наводить меняется цвет
             if git1.collidepoint(pygame.mouse.get_pos()):
-                link_color1 = (70, 30, 220)
+                link_color1 = (255, 165, 0)
             else:
-                link_color1 = (0, 0, 0)
+                link_color1 = (70, 30, 220)
 
             if git2.collidepoint(pygame.mouse.get_pos()):
-                link_color2 = (70, 30, 220)
+                link_color2 = (255, 165, 0)
             else:
-                link_color2 = (0, 0, 0)
+                link_color2 = (70, 30, 220)
 
             pygame.display.update()
             pygame.display.flip()
@@ -473,6 +473,8 @@ class Target(pygame.sprite.Sprite):
                 random_ballon = random.randint(1, 3)
                 path = f"Texture_and_Sound/balloon{random_ballon}.png"
                 Target(self.group, path, 2)
+            if self.level == 1:
+                Target(self.group)
 
 
 if __name__ == "__main__":
